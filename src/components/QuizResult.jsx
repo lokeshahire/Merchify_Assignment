@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./QuizResult.css";
 
 const QuizResult = () => {
@@ -9,8 +9,31 @@ const QuizResult = () => {
   return (
     <div className="quiz-result-container">
       <h2>Quiz Result</h2>
-      <p>Score: {score}</p>
-      <p>Time Taken: {timeTaken} seconds</p>
+      <div className="fireworks">
+        <div className="firework"></div>
+        <div className="firework"></div>
+        <div className="firework"></div>
+
+        <div className="firework"></div>
+      </div>
+      <img
+        className="boyImage"
+        src="https://static.vecteezy.com/system/resources/previews/006/634/891/original/cartoon-a-boy-waving-hand-free-vector.jpg"
+        alt=""
+      />
+      <h2>Karma Point Earn: {score * 10}</h2>
+
+      <h2>Time Taken: {timeTaken} seconds</h2>
+      <Link to={`/`}>
+        <button>Home</button>
+      </Link>
+
+      <div className="fireworks">
+        <div className="firework"></div>
+        <div className="firework"></div>
+        <div className="firework"></div>
+        <div className="firework"></div>
+      </div>
     </div>
   );
 };

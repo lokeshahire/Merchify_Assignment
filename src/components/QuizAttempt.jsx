@@ -5,26 +5,47 @@ import "./QuizAttempt.css";
 const QuizAttempt = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [timeRemaining, setTimeRemaining] = useState(60); // 60 seconds
 
   useEffect(() => {
-    // Fetch quiz questions from an API or define them locally
-    // Update the `questions` state with the fetched questions
     const fetchedQuestions = [
       {
         id: 1,
-        question: "What is the capital of France?",
-        options: ["Paris", "London", "Berlin", "Rome"],
-        correctAnswer: "Paris",
+        question: "Who Is Prime Minister of India ?",
+        options: [
+          "Narendra Modi",
+          "Amit Shaha",
+          "Rahul Gandhi",
+          "Uddhav Thakare",
+        ],
+        correctAnswer: "Narendra Modi",
       },
       {
         id: 2,
-        question: "Which planet is known as the Red Planet?",
-        options: ["Mars", "Venus", "Jupiter", "Mercury"],
-        correctAnswer: "Mars",
+        question: "Which is the capital city of India ?",
+        options: ["Mumbai", "Delhi", "Pune", "Kolkata"],
+        correctAnswer: "Delhi",
       },
-      // Add more questions here...
+      {
+        id: 3,
+        question: "The World Largest desert is ?",
+        options: ["Thar", "Kalahari", "Sahara", "Sonoran"],
+        correctAnswer: "Sahara",
+      },
+      {
+        id: 4,
+        question: "Mount Everest is located in ?",
+        options: ["India", "Nepal", "Tibet", "China"],
+        correctAnswer: "Nepal",
+      },
+      {
+        id: 5,
+        question: "The largest river in India is ?",
+        options: ["Yamuna", "Kaveri", "Ganga", "Bramaputra"],
+        correctAnswer: "Ganga",
+      },
     ];
 
     setQuestions(fetchedQuestions);
@@ -44,15 +65,36 @@ const QuizAttempt = () => {
     return () => clearInterval(countdown);
   }, [timeRemaining]);
 
-  const handleAnswerSelection = (questionIndex, selectedAnswer) => {
+  const handleAnswerSelection = (selectedAnswer) => {
     setAnswers((prevAnswers) => {
       const updatedAnswers = [...prevAnswers];
-      updatedAnswers[questionIndex] = selectedAnswer;
+      updatedAnswers[currentQuestionIndex] = selectedAnswer;
       return updatedAnswers;
     });
   };
 
+  const handleNextQuestion = () => {
+    const nextQuestionIndex = currentQuestionIndex + 1;
+    if (nextQuestionIndex < questions.length) {
+      setCurrentQuestionIndex(nextQuestionIndex);
+    } else {
+      handleSubmit();
+    }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
+    }
+  };
+
   const handleSubmit = () => {
+    const isAnyQuestionUnanswered = answers.some((answer) => answer === "");
+    if (isAnyQuestionUnanswered) {
+      alert("Please answer all the questions before submitting.");
+      return;
+    }
+
     const score = questions.reduce((totalScore, question, index) => {
       if (question.correctAnswer === answers[index]) {
         return totalScore + 1;
@@ -63,37 +105,55 @@ const QuizAttempt = () => {
     navigate("/result", { state: { score, timeTaken: 60 - timeRemaining } });
   };
 
+  const currentQuestion = questions[currentQuestionIndex];
+
   return (
-    <div className="quiz-attempt-container">
+    <div style={{ marginTop: "-0px" }} className="quiz-attempt-container">
       <h2>Quiz Attempt</h2>
-      <div>
-        {questions.map((question, index) => (
-          <div key={question.id}>
-            <h3>Question {index + 1}</h3>
-            <p>{question.question}</p>
-            <ul>
-              {question.options.map((option) => (
-                <li key={option}>
-                  <label>
-                    <input
-                      type="radio"
-                      name={`question-${question.id}`}
-                      value={option}
-                      checked={answers[index] === option}
-                      onChange={() => handleAnswerSelection(index, option)}
-                    />
-                    {option}
-                  </label>
-                </li>
-              ))}
-            </ul>
+      <div className="timeRemain">{timeRemaining} seconds</div>
+      {currentQuestion && (
+        <div>
+          <h3>Question {currentQuestionIndex + 1}</h3>
+          <p>{currentQuestion.question}</p>
+          <ul>
+            {currentQuestion.options.map((option) => (
+              <li key={option}>
+                <label>
+                  <input
+                    type="radio"
+                    name={`question-${currentQuestion.id}`}
+                    value={option}
+                    checked={answers[currentQuestionIndex] === option}
+                    onChange={() => handleAnswerSelection(option)}
+                  />
+                  {option}
+                </label>
+              </li>
+            ))}
+          </ul>
+          {/* <button onClick={handleNextQuestion}>Next Question</button> */}
+          <div className="button-container">
+            <button
+              className="previous-button"
+              onClick={handlePreviousQuestion}
+              disabled={currentQuestionIndex === 0}
+            >
+              Previous
+            </button>
+            <button
+              className="next-button"
+              onClick={handleNextQuestion}
+              disabled={currentQuestionIndex === questions.length - 1}
+            >
+              Next
+            </button>
           </div>
-        ))}
-      </div>
-      <div>
-        <p>Time Remaining: {timeRemaining} seconds</p>
-      </div>
-      <button onClick={handleSubmit}>Submit</button>
+        </div>
+      )}
+      <div>{/* <p>Time Remaining: {timeRemaining} seconds</p> */}</div>
+      <button className="submitButton" onClick={handleSubmit}>
+        Submit
+      </button>
     </div>
   );
 };
